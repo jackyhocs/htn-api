@@ -2,6 +2,8 @@ from flask import Flask, Blueprint
 from flask_restful import Api, Resource
 from config import SQLiteConfig
 from model import UserModel
+from sqlite3 import DatabaseError, ProgrammingError, IntegrityError, DataError
+from errors import ApiException
 
 app = Flask(__name__)
 app.config.from_object(SQLiteConfig)
@@ -12,18 +14,43 @@ api = Api(app)
 class User(Resource):
     def get(self, _id):
         user_model = UserModel()
-        user = user_model.get_by_id(_id)
+        try:
+            user = user_model.get_by_id(_id)
+        except (DatabaseError, IntegrityError) as e:
+            return "Internal Server Error", 500
+        except DataError as e:
+            return "User with ID {} does not exist".format(_id), 404
+
         return user.get_fields(), 200
 
     def delete(self, _id):
         user_model = UserModel()
-        user_model.delete_user(_id)
+        try:
+            user_model.delete_user(_id)
+        except (DatabaseError, IntegrityError) as e:
+            return ApiException(
+                message="Internal Server Error",
+                status=500
+            ).response()
+        except DataError as e:
+            return ApiException(
+                message="User with ID {} does not exist".format(_id),
+                status=404
+            ).response()
+
         return {}, 204
 
 class UserQuery(Resource):
     def get(self):
         user_model = UserModel()
-        users = user_model.get_all_users()
+        try:
+            users = user_model.get_all_users()
+        except (DatabaseError, IntegrityError) as e:
+            return ApiException(
+                message="Internal Server Error",
+                status=500
+            ).response()
+
         return users, 200
 
 

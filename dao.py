@@ -13,20 +13,38 @@ c = conn.cursor()
 class UserDao():
     @classmethod
     def get_by_id(cls, _id):
-        c.execute("SELECT * FROM USERS WHERE id=:id", {'id': _id})
-        return c.fetchone()
+        try:
+            c.execute("SELECT * FROM USERS WHERE id=:id", {'id': _id})
+            user = c.fetchone()
+        except sqlite3.Error as e:
+            raise sqlite3.DatabaseError from e
+
+        if not user:
+            print("data error")
+            raise sqlite3.DataError
+        return user
 
     @classmethod
     def get_all_users(cls):
-        c.execute("SELECT * FROM USERS")
-        return c.fetchall()
+        try:
+            c.execute("SELECT * FROM USERS")
+            users = c.fetchall()
+        except sqlite3.Error as e:
+            raise sqlite3.DatabaseError from e
+        return users
 
     @classmethod
     def delete_user(cls, _id):
         with conn:
-            c.execute("DELETE from USERS WHERE id = :id",
+            try:
+                c.execute("DELETE from USERS WHERE id = :id",
                       {'id': _id})
+                deleted = c.execute("SELECT changes()")
+            except sqlite3.Error as e:
+                raise sqlite3.DatabaseError from e
 
+            if not deleted:
+                raise sqlite3.DataError
 
 
 '''
