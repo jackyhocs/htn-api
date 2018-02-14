@@ -11,12 +11,20 @@ api = Api(app)
 
 class User(Resource):
     def get(self, _id):
-        return {"message": "no"}, 200
+        user_model = UserModel()
+        user = user_model.get_by_id(_id)
+        return user.get_fields(), 200
 
+    def delete(self, _id):
+        user_model = UserModel()
+        user_model.delete_user(_id)
+        return {}, 204
 
 class UserQuery(Resource):
     def get(self):
-        return {"message": "no"}, 200
+        user_model = UserModel()
+        users = user_model.get_all_users()
+        return users, 200
 
 
 api.add_resource(User, '/users/<int:_id>')

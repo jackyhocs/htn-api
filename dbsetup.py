@@ -25,9 +25,9 @@ c.execute("""CREATE TABLE USERS (
 "picture":"http://lorempixel.com/200/200/sports/8",
 "skills":[{"name":"JS","rating":5},{"name":"Go","rating":5}]}
 '''
-with open('user.json', 'r') as data_file:
+with open('users.json', 'r') as data_file:
     users = json.loads(data_file.read())
-    i = 0;
+    i = 0
     for user in users:
         c.execute("INSERT INTO USERS VALUES(:id ,:name, :picture, :company, :email, :phone, :latitude, :longitude, :skills)",
                   {
@@ -41,11 +41,10 @@ with open('user.json', 'r') as data_file:
                       'longitude': user['longitude'],
                       'skills': json.dumps(user['skills']),
                    })
-        ++i
-
+        i += 1
 conn.commit()
 
 
-p = c.execute("SELECT * FROM USERS WHERE name=:name", {'name': "Jenna Luna"})
-print(p.fetchall())
+# p = c.execute("SELECT * FROM USERS WHERE name=:name", {'name': "Jenna Luna"})
+# print(p.fetchall())
 conn.close()
