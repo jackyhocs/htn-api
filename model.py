@@ -5,6 +5,7 @@ from dao import UserDao
 class UserModel:
     _dao = None
     _collection = None
+
     def __init__(self, collection: dict = {}):
         self._dao        = UserDao
         self._collection = collection
@@ -39,4 +40,5 @@ class UserModel:
         self._dao.delete_user(_id)
 
     def update_user(self, _id, payload):
-        return UserModel({"name": "hello"})
+        user = self._dao.update_user(_id, payload)
+        return UserModel(user)
