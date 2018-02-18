@@ -23,17 +23,22 @@ class UserModel:
         dict = self.__dict__
         dict.pop('_dao', None)
         dict.pop('_collection', None)
+
         return dict
 
     def get_by_id(self, _id):
         user = self._dao.get_by_id(_id)
+
         return UserModel(user)
 
     def get_all_users(self):
         users = self._dao.get_all_users()
-        user_collection = [{"count" : len(users)}]
+
+        user_collection = [{"count": len(users)}]
+
         for user in users:
             user_collection.append(UserModel(user).get_fields())
+
         return user_collection
 
     def delete_user(self, _id):
@@ -41,4 +46,10 @@ class UserModel:
 
     def update_user(self, _id, payload):
         user = self._dao.update_user(_id, payload)
+
         return UserModel(user)
+
+    def find_skill_by_params(self, payload):
+        skills = self._dao.find_skill_by_params(payload)
+
+        return skills
